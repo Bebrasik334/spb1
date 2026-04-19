@@ -71,7 +71,9 @@ const polyline = L.polyline(route,{
 
 
 // авто-подгон карты под маршрут
-map.flyToBounds(polyline.getBounds(),{
-    padding:[50,50],
-    duration:1.5
+map.whenReady(() => {
+    map.flyToBounds(polyline.getBounds(), {
+        padding:[50,50],
+        duration:1.5
+    });
 });
