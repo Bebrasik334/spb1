@@ -1,5 +1,5 @@
 // создание карты
-const map = L.map('map');
+const map = L.map('map').setView([59.935, 30.335], 13);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap'
