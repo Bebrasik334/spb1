@@ -1,79 +1,73 @@
-// Map.js
+// ===== СОЗДАЁМ КАРТУ =====
+const map = L.map('map');
 
-import React, { useEffect, useRef } from "react";
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution:'© OpenStreetMap'
+}).addTo(map);
 
-export default function Map({ places }) {
-  const mapRef = useRef(null);
-  const mapInstance = useRef(null);
 
-  useEffect(() => {
-    if (!window.google || mapInstance.current) return;
-
-    // ✅ ОБЯЗАТЕЛЬНО задаём center + zoom
-    mapInstance.current = new window.google.maps.Map(mapRef.current, {
-      center: { lat: 41.2995, lng: 69.2401 }, // старт (Ташкент пример)
-      zoom: 12,
+// ===== КРАСИВЫЕ НОМЕРА ТОЧЕК =====
+function createMarker(number){
+    return L.divIcon({
+        className:'marker',
+        html:number,
+        iconSize:[26,26],
+        iconAnchor:[13,13]
     });
-
-    const bounds = new window.google.maps.LatLngBounds();
-
-    places.forEach(place => {
-      const position = {
-        lat: place.lat,
-        lng: place.lng,
-      };
-
-      // ✅ Marker
-      const marker = new window.google.maps.Marker({
-        position,
-        map: mapInstance.current,
-        title: place.name,
-      });
-
-      // ✅ Добавляем в bounds
-      bounds.extend(position);
-
-      // ✅ КЛИК → открыть ТОЧНО ЭТУ точку
-      marker.addListener("click", () => {
-        openMaps(place);
-      });
-    });
-
-    // ✅ Авто подгон карты под все точки
-    if (places.length > 0) {
-      mapInstance.current.fitBounds(bounds);
-    }
-  }, [places]);
-
-  return (
-    <div
-      ref={mapRef}
-      style={{ width: "100%", height: "500px" }}
-    />
-  );
 }
 
 
-// ============================
-// ✅ ОТКРЫТИЕ ТОЧКИ В КАРТАХ
-// ============================
+// ===== ТОЧКИ =====
+const points = [
+{coords:[59.9316,30.3565],name:"Улица Джона Леннона"},
+{coords:[59.9376,30.3483],name:"Подписные издания"},
+{coords:[59.9378,30.3478],name:"Памятник потерянной книге"},
+{coords:[59.9384,30.3468],name:"Фонтанный дом Анны Ахматовой"},
+{coords:[59.9415,30.3534],name:"Особняк Небылица"},
+{coords:[59.9441,30.3463],name:"Мозаичный дворик"},
+{coords:[59.9358,30.3299],name:"Sokol Coffee"},
+{coords:[59.9340,30.3293],name:"Думская башня"},
+{coords:[59.9389,30.3084],name:"Зеркальный дворик"}
+];
 
-function openMaps(place) {
-  const lat = place.lat;
-  const lng = place.lng;
-  const name = encodeURIComponent(place.name);
 
-  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+// ===== ГРАНИЦЫ ДЛЯ fitBounds =====
+const bounds = [];
 
-  let url;
 
-  if (isIOS) {
-    // Apple Maps
-    url = `https://maps.apple.com/?ll=${lat},${lng}&q=${name}`;
-  } else {
-    // Google Maps — ПО КООРДИНАТАМ
-    url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
-  }
+// ===== СОЗДАЁМ МАРКЕРЫ =====
+points.forEach((point,index)=>{
 
-  window.open(url, "_blank");
-}
+    const marker = L.marker(point.coords,{
+        icon:createMarker(index+1)
+    }).addTo(map);
+
+    marker.bindPopup(`<b>${point.name}</b>`);
+
+    bounds.push(point.coords);
+
+    // 🔥 ОТКРЫТИЕ ТОЧНОЙ ТОЧКИ В КАРТАХ
+    marker.on("click",()=>{
+
+        const lat = point.coords[0];
+        const lon = point.coords[1];
+
+        const url =
+        `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
+
+        window.open(url,"_blank");
+    });
+});
+
+
+// ===== РИСУЕМ МАРШРУТ =====
+const route = points.map(p=>p.coords);
+
+L.polyline(route,{
+    color:"#ef4444",
+    weight:4
+}).addTo(map);
+
+
+// ===== АВТОПОДГОН КАРТЫ =====
+map.fitBounds(bounds);
