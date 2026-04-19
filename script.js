@@ -73,32 +73,4 @@ search:"Зеркальный дворик Санкт-Петербург"
 
 ];
 
-
-points.forEach((point,index)=>{
-
-const marker = L.marker(point.coords,{
-icon:createMarker(index+1)
-}).addTo(map);
-
-
-marker.on("click",function(){
-
-const url = "https://yandex.ru/maps/?text=" + encodeURIComponent(point.search);
-
-window.open(url,"_blank");
-
-});
-
-});
-
-
-const route = points.map(p=>p.coords);
-
-L.polyline(route,{
-color:"#ef4444",
-weight:4
-}).addTo(map);
-
-
-
 fix markers
