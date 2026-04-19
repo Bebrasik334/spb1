@@ -1,114 +1,79 @@
-// создание карты
-const map = L.map('map').setView([59.935, 30.335], 13);
+// Map.js
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap'
-}).addTo(map);
+import React, { useEffect, useRef } from "react";
 
+export default function Map({ places }) {
+  const mapRef = useRef(null);
+  const mapInstance = useRef(null);
 
-// маркер с номером
-function createMarker(number){
-    return L.divIcon({
-        className:'marker',
-        html:number,
-        iconSize:[26,26],
-        iconAnchor:[13,13]
+  useEffect(() => {
+    if (!window.google || mapInstance.current) return;
+
+    // ✅ ОБЯЗАТЕЛЬНО задаём center + zoom
+    mapInstance.current = new window.google.maps.Map(mapRef.current, {
+      center: { lat: 41.2995, lng: 69.2401 }, // старт (Ташкент пример)
+      zoom: 12,
     });
+
+    const bounds = new window.google.maps.LatLngBounds();
+
+    places.forEach(place => {
+      const position = {
+        lat: place.lat,
+        lng: place.lng,
+      };
+
+      // ✅ Marker
+      const marker = new window.google.maps.Marker({
+        position,
+        map: mapInstance.current,
+        title: place.name,
+      });
+
+      // ✅ Добавляем в bounds
+      bounds.extend(position);
+
+      // ✅ КЛИК → открыть ТОЧНО ЭТУ точку
+      marker.addListener("click", () => {
+        openMaps(place);
+      });
+    });
+
+    // ✅ Авто подгон карты под все точки
+    if (places.length > 0) {
+      mapInstance.current.fitBounds(bounds);
+    }
+  }, [places]);
+
+  return (
+    <div
+      ref={mapRef}
+      style={{ width: "100%", height: "500px" }}
+    />
+  );
 }
 
 
-// точки маршрута
-const points = [
+// ============================
+// ✅ ОТКРЫТИЕ ТОЧКИ В КАРТАХ
+// ============================
 
-{
-coords:[59.9316,30.3565],
-name:"Улица Джона Леннона",
-search:"Улица Джона Леннона Санкт-Петербург"
-},
+function openMaps(place) {
+  const lat = place.lat;
+  const lng = place.lng;
+  const name = encodeURIComponent(place.name);
 
-{
-coords:[59.9376,30.3483],
-name:"Подписные издания",
-search:"Подписные издания Санкт-Петербург"
-},
+  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-{
-coords:[59.9378,30.3478],
-name:"Памятник потерянной книге",
-search:"Памятник потерянной книге Санкт-Петербург"
-},
+  let url;
 
-{
-coords:[59.9384,30.3468],
-name:"Фонтанный дом Анны Ахматовой",
-search:"Фонтанный дом Анны Ахматовой"
-},
+  if (isIOS) {
+    // Apple Maps
+    url = `https://maps.apple.com/?ll=${lat},${lng}&q=${name}`;
+  } else {
+    // Google Maps — ПО КООРДИНАТАМ
+    url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+  }
 
-{
-coords:[59.9415,30.3534],
-name:"Особняк Небылица",
-search:"Особняк Небылица Санкт-Петербург"
-},
-
-{
-coords:[59.9441,30.3463],
-name:"Мозаичный дворик",
-search:"Мозаичный дворик Санкт-Петербург"
-},
-
-{
-coords:[59.9358,30.3299],
-name:"Sokol Coffee",
-search:"Sokol Coffee Санкт-Петербург"
-},
-
-{
-coords:[59.9340,30.3293],
-name:"Думская башня",
-search:"Думская башня Санкт-Петербург"
-},
-
-{
-coords:[59.9389,30.3084],
-name:"Зеркальный дворик",
-search:"Зеркальный дворик Санкт-Петербург"
+  window.open(url, "_blank");
 }
-
-];
-
-
-// маркеры
-points.forEach((point,index)=>{
-
-    const marker = L.marker(point.coords,{
-        icon:createMarker(index+1)
-    }).addTo(map);
-
-    marker.bindPopup(`<b>${point.name}</b>`);
-
-    // ✅ как в твоём первом варианте
-    marker.on("click",function(){
-
-        const url =
-            "https://yandex.ru/maps/?text=" +
-            encodeURIComponent(point.search);
-
-        window.open(url,"_blank");
-    });
-
-});
-
-
-// линия маршрута
-const route = points.map(p=>p.coords);
-
-const polyline = L.polyline(route,{
-    color:"#ef4444",
-    weight:4
-}).addTo(map);
-
-
-// автоподгон карты
-map.fitBounds(polyline.getBounds(),{
-    padding:[50,50]
-});
