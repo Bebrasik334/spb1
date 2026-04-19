@@ -1,12 +1,11 @@
-// ===== СОЗДАЁМ КАРТУ =====
-const map = L.map('map');
+const map = L.map('map').setView([59.935, 30.335], 13);
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-    attribution:'© OpenStreetMap'
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap'
 }).addTo(map);
 
 
-// ===== КРАСИВЫЕ НОМЕРА ТОЧЕК =====
+// ===== ИКОНКА =====
 function createMarker(number){
     return L.divIcon({
         className:'marker',
@@ -31,11 +30,7 @@ const points = [
 ];
 
 
-// ===== ГРАНИЦЫ ДЛЯ fitBounds =====
-const bounds = [];
-
-
-// ===== СОЗДАЁМ МАРКЕРЫ =====
+// ===== МАРКЕРЫ =====
 points.forEach((point,index)=>{
 
     const marker = L.marker(point.coords,{
@@ -44,30 +39,24 @@ points.forEach((point,index)=>{
 
     marker.bindPopup(`<b>${point.name}</b>`);
 
-    bounds.push(point.coords);
-
-    // 🔥 ОТКРЫТИЕ ТОЧНОЙ ТОЧКИ В КАРТАХ
-    marker.on("click",()=>{
+    // 👉 КАК БЫЛО РАНЬШЕ — ЯНДЕКС КАРТЫ
+    marker.on("click", function(){
 
         const lat = point.coords[0];
         const lon = point.coords[1];
 
-        const url =
-        `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
+        const url = `https://yandex.ru/maps/?ll=${lon},${lat}&z=17`;
 
         window.open(url,"_blank");
     });
+
 });
 
 
-// ===== РИСУЕМ МАРШРУТ =====
+// ===== МАРШРУТ =====
 const route = points.map(p=>p.coords);
 
 L.polyline(route,{
     color:"#ef4444",
     weight:4
 }).addTo(map);
-
-
-// ===== АВТОПОДГОН КАРТЫ =====
-map.fitBounds(bounds);
