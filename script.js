@@ -5,72 +5,98 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 
+// создание круглых маркеров с номером
 function createMarker(number){
-return L.divIcon({
-className:'marker',
-html:number,
-iconSize:[26,26],
-iconAnchor:[13,13]
-});
+    return L.divIcon({
+        className:'marker',
+        html:number,
+        iconSize:[26,26],
+        iconAnchor:[13,13]
+    });
 }
 
 
+// точки маршрута
 const points = [
 
 {
 coords:[59.9316,30.3565],
-name:"Улица Джона Леннона",
-search:"Улица Джона Леннона Санкт-Петербург"
+name:"Улица Джона Леннона"
 },
 
 {
 coords:[59.9376,30.3483],
-name:"Подписные издания",
-search:"Подписные издания Санкт-Петербург"
+name:"Подписные издания"
 },
 
 {
 coords:[59.9378,30.3478],
-name:"Памятник потерянной книге",
-search:"Памятник потерянной книге Санкт-Петербург"
+name:"Памятник потерянной книге"
 },
 
 {
 coords:[59.9384,30.3468],
-name:"Фонтанный дом Анны Ахматовой",
-search:"Фонтанный дом Анны Ахматовой"
+name:"Фонтанный дом Анны Ахматовой"
 },
 
 {
 coords:[59.9415,30.3534],
-name:"Особняк Небылица",
-search:"Особняк Небылица Санкт-Петербург"
+name:"Особняк Небылица"
 },
 
 {
 coords:[59.9441,30.3463],
-name:"Мозаичный дворик",
-search:"Мозаичный дворик Санкт-Петербург"
+name:"Мозаичный дворик"
 },
 
 {
 coords:[59.9358,30.3299],
-name:"Sokol Coffee",
-search:"Sokol Coffee Санкт-Петербург"
+name:"Sokol Coffee"
 },
 
+// ✅ исправленная Думская башня
 {
 coords:[59.9340,30.3293],
-name:"Думская башня",
-search:"Думская башня Санкт-Петербург"
+name:"Думская башня"
 },
 
 {
 coords:[59.9389,30.3084],
-name:"Зеркальный дворик",
-search:"Зеркальный дворик Санкт-Петербург"
+name:"Зеркальный дворик"
 }
 
 ];
 
-fix markers
+
+// добавление маркеров
+points.forEach((point,index)=>{
+
+    const marker = L.marker(point.coords,{
+        icon:createMarker(index+1)
+    }).addTo(map);
+
+    // всплывающее название
+    marker.bindPopup(`<b>${point.name}</b>`);
+
+    // переход в Яндекс.Карты по координатам
+    marker.on("click", function(){
+
+        const lat = point.coords[0];
+        const lon = point.coords[1];
+
+        const url = `https://yandex.ru/maps/?ll=${lon},${lat}&z=17`;
+
+        window.open(url,"_blank");
+
+    });
+
+});
+
+
+// линия маршрута
+const route = points.map(p=>p.coords);
+
+L.polyline(route,{
+    color:"#ef4444",
+    weight:4
+}).addTo(map);
