@@ -6,7 +6,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 
-// кастомный маркер с номером
+// маркер с номером
 function createMarker(number){
     return L.divIcon({
         className:'marker',
@@ -20,40 +20,78 @@ function createMarker(number){
 // точки маршрута
 const points = [
 
-{coords:[59.9316,30.3565],name:"Улица Джона Леннона"},
-{coords:[59.9376,30.3483],name:"Подписные издания"},
-{coords:[59.9378,30.3478],name:"Памятник потерянной книге"},
-{coords:[59.9384,30.3468],name:"Фонтанный дом Анны Ахматовой"},
-{coords:[59.9415,30.3534],name:"Особняк Небылица"},
-{coords:[59.9441,30.3463],name:"Мозаичный дворик"},
-{coords:[59.9358,30.3299],name:"Sokol Coffee"},
+{
+coords:[59.9316,30.3565],
+name:"Улица Джона Леннона",
+search:"Улица Джона Леннона Санкт-Петербург"
+},
 
-// исправленная Думская башня
-{coords:[59.9340,30.3293],name:"Думская башня"},
+{
+coords:[59.9376,30.3483],
+name:"Подписные издания",
+search:"Подписные издания Санкт-Петербург"
+},
 
-{coords:[59.9389,30.3084],name:"Зеркальный дворик"}
+{
+coords:[59.9378,30.3478],
+name:"Памятник потерянной книге",
+search:"Памятник потерянной книге Санкт-Петербург"
+},
+
+{
+coords:[59.9384,30.3468],
+name:"Фонтанный дом Анны Ахматовой",
+search:"Фонтанный дом Анны Ахматовой"
+},
+
+{
+coords:[59.9415,30.3534],
+name:"Особняк Небылица",
+search:"Особняк Небылица Санкт-Петербург"
+},
+
+{
+coords:[59.9441,30.3463],
+name:"Мозаичный дворик",
+search:"Мозаичный дворик Санкт-Петербург"
+},
+
+{
+coords:[59.9358,30.3299],
+name:"Sokol Coffee",
+search:"Sokol Coffee Санкт-Петербург"
+},
+
+{
+coords:[59.9340,30.3293],
+name:"Думская башня",
+search:"Думская башня Санкт-Петербург"
+},
+
+{
+coords:[59.9389,30.3084],
+name:"Зеркальный дворик",
+search:"Зеркальный дворик Санкт-Петербург"
+}
 
 ];
 
 
-// добавление маркеров
+// маркеры
 points.forEach((point,index)=>{
 
     const marker = L.marker(point.coords,{
         icon:createMarker(index+1)
     }).addTo(map);
 
-    // всплывающее название
     marker.bindPopup(`<b>${point.name}</b>`);
 
-    // переход в Яндекс.Карты
-    marker.on("click", function(){
+    // ✅ как в твоём первом варианте
+    marker.on("click",function(){
 
-        const lat = point.coords[0];
-        const lon = point.coords[1];
-
-        // ссылка с меткой
-        const url = `https://yandex.ru/maps/?pt=${lon},${lat},pm2rdm&z=17`;
+        const url =
+            "https://yandex.ru/maps/?text=" +
+            encodeURIComponent(point.search);
 
         window.open(url,"_blank");
     });
@@ -70,10 +108,7 @@ const polyline = L.polyline(route,{
 }).addTo(map);
 
 
-// авто-подгон карты под маршрут
-map.whenReady(() => {
-    map.flyToBounds(polyline.getBounds(), {
-        padding:[50,50],
-        duration:1.5
-    });
+// автоподгон карты
+map.fitBounds(polyline.getBounds(),{
+    padding:[50,50]
 });
