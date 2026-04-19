@@ -1,43 +1,27 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
 <meta charset="UTF-8">
-<title>Маршрут</title>
+<title>Маршрут по Санкт-Петербургу</title>
 
-<link
- rel="stylesheet"
- href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-/>
-
-<style>
-html, body{
-    margin:0;
-    padding:0;
-    height:100%;
-}
-
-#map{
-    height:100vh;
-}
-
-.marker{
-    background:#ef4444;
-    color:white;
-    border-radius:50%;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-weight:bold;
-}
-</style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+<link rel="stylesheet" href="style.css">
 
 </head>
 
 <body>
 
-<div id="map"></div>
+<header>
+<h1>Маршрут по Санкт-Петербургу</h1>
+<p>Книжные места и интересные точки</p>
+</header>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<main>
+<div id="map"></div>
+</main>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="script.js"></script>
 
 </body>
