@@ -98,3 +98,7 @@ L.polyline(route,{
 color:"#ef4444",
 weight:4
 }).addTo(map);
+
+
+
+fix markers
